@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MechMate AI — Design System Preview</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+  :root{
+    --bg:#f7f8fc; --surface:#ffffff; --surface-2:#eef1f8;
+    --text:#141a2b; --muted:#5b657f; --line:#e2e7f2;
+    --primary:#3b5bfd; --primary-ink:#ffffff;
+    --success:#12805c; --success-bg:#e2f5ec;
+    --warning:#9a6200; --warning-bg:#fff3d6;
+    --danger:#c03535; --danger-bg:#fdecec;
+    --radius:14px; --radius-s:10px;
+    --shadow:0 6px 24px rgba(20,26,43,.08);
+    --font:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  [data-theme="dark"]{
+    --bg:#0f1320; --surface:#171d31; --surface-2:#202742;
+    --text:#eef1ff; --muted:#a6b0c9; --line:#2a3352;
+    --primary:#6b86ff; --primary-ink:#0f1320;
+    --success-bg:#123c2e; --success:#7fe3b2;
+    --warning-bg:#4a3800; --warning:#ffd97a;
+    --danger-bg:#4d1d1d; --danger:#ff9d9d;
+    --shadow:0 6px 24px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--text);font-family:var(--font);background:#020409;min-height:100vh}
+  /* Black + blue marbled home background (CSS-only, no image) */
+  body::before{content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1100px 620px at 12% 8%, rgba(43,92,255,.6), transparent 60%),
+      radial-gradient(900px 700px at 88% 18%, rgba(0,122,255,.5), transparent 62%),
+      radial-gradient(700px 500px at 72% 62%, rgba(110,175,255,.28), transparent 65%),
+      radial-gradient(1000px 800px at 50% 95%, rgba(6,10,50,.96), transparent 72%),
+      linear-gradient(180deg, #050817 0%, #02030a 55%, #000208 100%);
+  }
+  body::after{content:"";position:fixed;inset:-12%;z-index:-1;opacity:.6;mix-blend-mode:screen;pointer-events:none;
+    background:
+      repeating-radial-gradient(ellipse 60% 50% at 32% 42%, rgba(130,185,255,.13) 0 2px, transparent 2px 20px),
+      repeating-radial-gradient(ellipse 55% 60% at 68% 58%, rgba(50,110,255,.16) 0 2px, transparent 2px 24px),
+      repeating-radial-gradient(ellipse 70% 40% at 50% 80%, rgba(20,60,180,.2) 0 3px, transparent 3px 30px),
+      conic-gradient(from 210deg at 50% 45%, transparent 0deg, rgba(95,150,255,.14) 40deg, transparent 90deg, rgba(30,80,255,.12) 180deg, transparent 260deg);
+    filter:blur(.6px) contrast(1.25);
+    transform:rotate(-8deg) scale(1.15);
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+  header.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+    color:#d6e6ff;font-family:"Times New Roman",Georgia,serif;font-style:italic;font-weight:400;font-size:31px;line-height:1;padding-bottom:5px;
+    background:
+      radial-gradient(32px 24px at 30% 22%, rgba(130,190,255,.95), transparent 70%),
+      radial-gradient(38px 30px at 76% 72%, rgba(43,92,255,.95), transparent 70%),
+      radial-gradient(46px 46px at 50% 50%, rgba(0,8,35,.96), transparent 78%),
+      #02030a;
+    border:1px solid rgba(130,175,255,.55);
+    box-shadow:inset 0 0 12px rgba(70,130,255,.55), 0 2px 12px rgba(0,0,0,.55);}
+  header.top h1{color:#f2f6ff} header.top .sub{color:#a9b8e8}
+  h1{font-size:28px;margin:0} .sub{color:var(--muted);margin:4px 0 0}
+  button{font-family:var(--font)}
+  .btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:9px 14px;cursor:pointer}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:var(--primary-ink);font-weight:700}
+  .grid{display:grid;gap:16px}
+  @media(min-width:900px){.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:1fr 1fr 1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  .card h2{font-size:18px;margin:0 0 6px} .card h3{font-size:15px;margin:16px 0 8px}
+  .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+  .muted{color:var(--muted)} .small{font-size:13px}
+  code,.mono{font-family:var(--mono);font-size:13px}
+  .tokens{display:flex;flex-wrap:wrap;gap:10px}
+  .swatch{border:1px solid var(--line);border-radius:var(--radius-s);padding:10px 12px;background:var(--surface);min-width:150px}
+  .dot{width:100%;height:34px;border-radius:8px;margin-bottom:8px;border:1px solid rgba(0,0,0,.08)}
+  input.search{width:100%;padding:13px 15px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:15px}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--surface-2)}
+  .pill.rec{background:var(--success-bg);color:var(--success);border-color:transparent}
+  .warn{background:var(--warning-bg);color:var(--warning);border:1px solid transparent;border-radius:var(--radius-s);padding:10px 12px;font-size:13.5px}
+  .refresher{background:var(--surface-2);border:1px dashed var(--primary);border-radius:var(--radius-s);padding:12px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line)}
+  details{border:1px solid var(--line);border-radius:var(--radius-s);padding:10px 12px;background:var(--surface)}
+  summary{cursor:pointer;font-weight:700}
+  .practice-opt{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px;margin:6px 0}
+  .kbd{font-family:var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:12px}
+  .bar{height:8px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+  .bar>i{display:block;height:100%;background:var(--primary)}
+  .qa{border-left:3px solid var(--primary);padding-left:12px}
+  footer{margin-top:26px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">x</div>
+      <div><h1>MechMate AI — Design System</h1>
+      <p class="sub">Preview from PRD §7–§18 • Concise by default • Learn → Apply → Practise → Reflect</p></div>
+    </div>
+    <button class="btn" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'':'dark'">Toggle dark</button>
+  </header>
+
+  <div class="grid two">
+    <div class="card"><div class="eyebrow">Tokens</div><h2>Color / Type / Spacing</h2>
+      <div class="tokens">
+        <div class="swatch"><div class="dot" style="background:#3b5bfd"></div><b>Primary</b><div class="small muted">--primary #3b5bfd</div></div>
+        <div class="swatch"><div class="dot" style="background:#ffffff;border:1px solid #e2e7f2"></div><b>Surface</b><div class="small muted">cards, inputs</div></div>
+        <div class="swatch"><div class="dot" style="background:#e2f5ec"></div><b>Success</b><div class="small muted">mastered / strengths</div></div>
+        <div class="swatch"><div class="dot" style="background:#fff3d6"></div><b>Warning</b><div class="small muted">prerequisite</div></div>
+      </div>
+      <h3>Type scale</h3><div style="font-size:28px;font-weight:800">Heading 28</div><div style="font-size:18px;font-weight:700">Card title 18</div><p style="margin:6px 0">Body 15–16 for concept text. <span class="muted">Math always as LaTeX (KaTeX), never images.</span></p>
+      <p class="small muted">Spacing 4 / 8 / 12 / 16 / 24 • Radius 10 / 14 • Targets ≥44px</p>
+    </div>
+    <div class="card"><div class="eyebrow">PRD §6 — Topic discovery</div><h2>Search → Subtopics</h2>
+      <input class="search" value="Kinematics" aria-label="Search" />
+      <p><span class="pill rec">Recommended order</span> <span class="pill">Free explore</span></p>
+      <div class="practice-opt"><b>1</b> Displacement</div>
+      <div class="practice-opt"><b>2</b> Velocity <span class="pill rec">next</span></div>
+      <div class="practice-opt"><b>3</b> Acceleration</div>
+      <div class="warn">⚠ Projectile motion uses Velocity components. You can continue — quick refresh available in context.</div>
+    </div>
+  </div>
+
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><div class="eyebrow">PRD §7.1 — Concept</div><h2>ConceptCard: Velocity</h2>
+      <p>Velocity is displacement per unit time, with direction. It tells you how fast <i>and where to</i>.</p>
+      <p class="small muted">Concise by default. Details on demand.</p>
+      <h3>FormulaCard + symbols/units (§7.2)</h3>
+      <p><span data-tex="v = \frac{\Delta x}{\Delta t}"></span></p>
+      <table><tr><th>Symbol</th><th>Meaning</th><th>Unit</th></tr>
+      <tr><td><code>v</code></td><td>velocity</td><td>m/s</td></tr>
+      <tr><td><code>Δx</code></td><td>displacement</td><td>m</td></tr>
+      <tr><td><code>Δt</code></td><td>time interval</td><td>s</td></tr></table>
+      <h3>Expandable details (§7.3)</h3>
+      <details><summary>What does it mean? When to use it?</summary><p class="small">Use when direction matters. For speed-only, use distance/time. Vector: sign/direction carries meaning.</p></details>
+    </div>
+    <div class="card"><div class="eyebrow">PRD §8 — Examples</div><h2>Progressive examples</h2>
+      <h3>Example 1 — Basic</h3><p class="small">Car moves Δx = 100 m in Δt = 20 s. <span data-tex="v = 100/20 = 5\ \text{m/s}"></span></p>
+      <h3>Example 2 — Challenging</h3><p class="small">Same speed, return trip → displacement 0 → average velocity 0. Recognize vs know-when-to-use.</p>
+      <div class="eyebrow">PRD §13 — Refresher (in-context only)</div>
+      <div class="refresher"><b>Quick refresh — Velocity components</b><br><span data-tex="v_x = u\cos\theta"></span> &nbsp; <span data-tex="v_y = u\sin\theta"></span><br><span class="small muted">Short, relevant, back to question →</span></div>
+    </div>
+  </div>
+
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><div class="eyebrow">PRD §9 — Practice</div><h2>PracticePlayer (adaptive)</h2>
+      <p><b>Q2 • Difficulty <span class="pill">2 / 3</span></b> — Projectile launched at u=20 m/s, θ=30°. Find <span data-tex="v_x"></span>.</p>
+      <div class="practice-opt"><span class="kbd">A</span> 10.0 m/s</div>
+      <div class="practice-opt"><span class="kbd">B</span> 17.3 m/s</div>
+      <div class="practice-opt"><span class="kbd">C</span> 20.0 m/s</div>
+      <p><button class="btn primary">Check</button> <button class="btn">Hint</button> <span class="small muted">Starts easy → harder on mastery, eases on struggle.</span></p>
+    </div>
+    <div class="card"><div class="eyebrow">PRD §10–§11 — Results / Retest</div><h2>ResultsPanel</h2>
+      <p><b>2 / 3 correct</b></p><div class="bar"><i style="width:66%"></i></div>
+      <p class="small">❌ Q2: correct <span data-tex="v_x = u\cos\theta = 17.3\ \text{m/s}"></span><br><span class="muted">Mistake: used sin for horizontal component. Concise, no full lecture.</span></p>
+      <p class="small" style="background:var(--success-bg);color:var(--success);padding:8px;border-radius:8px">✓ Strength: Displacement & average velocity — solid.</p>
+      <p><button class="btn primary">Clearer explanation → Retest</button></p>
+    </div>
+  </div>
+
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><div class="eyebrow">PRD §14 — Student questions</div><h2>QuestionDrawer</h2>
+      <div class="qa"><p><b>Student:</b> Why is horizontal acceleration zero?</p>
+      <p class="small"><b>MechMate:</b> No horizontal force (ignoring air) → no horizontal acceleration. Connects to <code>v<sub>x</sub> = constant</code> in projectile motion.</p></div>
+      <p class="small muted">1. Answer exact question. 2. Connect to current formula. Never generic chatbot.</p>
+    </div>
+    <div class="card"><div class="eyebrow">PRD §12 / §17 / §18</div><h2>Progression + Deep-dives</h2>
+      <p><span class="pill rec">Next: Acceleration →</span> <button class="btn">Explore freely</button></p>
+      <details><summary>Would you like to see derivation?</summary><p class="small">Optional. <span data-tex="v = u + at"></span> from a = dv/dt integration.</p></details>
+      <details><summary>Related formulas?</summary><p class="small">Optional. <span data-tex="s = ut + \tfrac12 at^2"></span></p></details>
+      <p class="small muted">End-of-lesson: “Answer a few questions to see application?” — formula + application side-by-side.</p>
+    </div>
+  </div>
+
+  <footer>Source: PRD §§6–18 • Stack target: Next.js + Tailwind + KaTeX + local Postgres + Better Auth + Ollama • No invented features.</footer>
+</div>
+<script>
+function renderMath(){
+  document.querySelectorAll('[data-tex]').forEach(el=>{
+    var tex = el.getAttribute('data-tex');
+    if (window.katex) {
+      try{ katex.render(tex, el, {throwOnError:false}); return; }
+      catch(e){ /* fall through to fallback */ }
+    }
+    el.innerHTML = '<code style="background:var(--surface-2);padding:2px 6px;border-radius:6px">' + tex + '</code> <span class="small muted">(KaTeX CDN blocked/offline — real app renders this as formatted math)</span>';
+  });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderMath);
+else renderMath();
+window.addEventListener('load', function(){ if(!window.katex) renderMath(); });
+</script>
+</body>
+</html>
