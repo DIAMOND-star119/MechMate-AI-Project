@@ -1,0 +1,34 @@
+{
+  "name": "mechmate-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:start": "pg_ctl -D \"%USERPROFILE%\\pgsql-data\" -l \"%USERPROFILE%\\pgsql-data\\logfile.log\" -o \"-p 5433\" start",
+    "db:stop": "pg_ctl -D \"%USERPROFILE%\\pgsql-data\" stop",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "better-auth": "^1.7.6",
+    "katex": "0.16.11",
+    "next": "15.5.4",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.13",
+    "@types/katex": "^0.16.8",
+    "@types/node": "24.5.2",
+    "@types/react": "19.1.13",
+    "postcss": "8.5.6",
+    "prisma": "^6.19.3",
+    "tailwindcss": "4.1.13",
+    "tsx": "^4.23.15",
+    "typescript": "5.9.2"
+  }
+}

@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+:root {
+  --bg: #020409;
+  --surface: #ffffff;
+  --surface-2: #eef1f8;
+  --text: #141a2b;
+  --muted: #5b657f;
+  --line: #e2e7f2;
+  --primary: #3b5bfd;
+  --primary-ink: #ffffff;
+  --success: #12805c;
+  --success-bg: #e2f5ec;
+  --warning: #9a6200;
+  --warning-bg: #fff3d6;
+  --radius: 14px;
+  --radius-s: 10px;
+  --font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: #020409;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Black + blue marbled home background (CSS-only) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(1100px 620px at 12% 8%, rgba(43, 92, 255, 0.6), transparent 60%),
+    radial-gradient(900px 700px at 88% 18%, rgba(0, 122, 255, 0.5), transparent 62%),
+    radial-gradient(700px 500px at 72% 62%, rgba(110, 175, 255, 0.28), transparent 65%),
+    radial-gradient(1000px 800px at 50% 95%, rgba(6, 10, 50, 0.96), transparent 72%),
+    linear-gradient(180deg, #050817 0%, #02030a 55%, #000208 100%);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: -1;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  background:
+    repeating-radial-gradient(ellipse 60% 50% at 32% 42%, rgba(130, 185, 255, 0.13) 0 2px, transparent 2px 20px),
+    repeating-radial-gradient(ellipse 55% 60% at 68% 58%, rgba(50, 110, 255, 0.16) 0 2px, transparent 2px 24px),
+    repeating-radial-gradient(ellipse 70% 40% at 50% 80%, rgba(20, 60, 180, 0.2) 0 3px, transparent 3px 30px),
+    conic-gradient(from 210deg at 50% 45%, transparent 0deg, rgba(95, 150, 255, 0.14) 40deg, transparent 90deg, rgba(30, 80, 255, 0.12) 180deg, transparent 260deg);
+  filter: blur(0.6px) contrast(1.25);
+  transform: rotate(-8deg) scale(1.15);
+}
+
+.mm-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: #d6e6ff;
+  font-family: "Times New Roman", Georgia, serif;
+  font-style: italic;
+  font-size: 31px;
+  line-height: 1;
+  padding-bottom: 5px;
+  background:
+    radial-gradient(32px 24px at 30% 22%, rgba(130, 190, 255, 0.95), transparent 70%),
+    radial-gradient(38px 30px at 76% 72%, rgba(43, 92, 255, 0.95), transparent 70%),
+    radial-gradient(46px 46px at 50% 50%, rgba(0, 8, 35, 0.96), transparent 78%),
+    #02030a;
+  border: 1px solid rgba(130, 175, 255, 0.55);
+  box-shadow: inset 0 0 12px rgba(70, 130, 255, 0.55), 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+.mm-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgba(20, 26, 43, 0.08);
+  padding: 18px;
+}
+
+.mm-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+}

@@ -1,0 +1,140 @@
+// Better Auth core tables (Postgres) + MechMate domain tables (PRD §§6-15).
+// Local Postgres via DATABASE_URL (see .env.example).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified Boolean   @default(false)
+  isAnonymous   Boolean   @default(false)
+  field         String?
+  level         String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  attempts      Attempt[]
+  progress      Progress[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Subject {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  topics Topic[]
+}
+
+model Topic {
+  id        String     @id @default(cuid())
+  name      String
+  subjectId String
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subtopics Subtopic[]
+
+  @@unique([subjectId, name])
+}
+
+model Subtopic {
+  id          String            @id @default(cuid())
+  name        String
+  concept     String
+  topicId     String
+  topic       Topic             @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  formulas    Formula[]
+  questions   PracticeQuestion[]
+  progress    Progress[]
+
+  @@unique([topicId, name])
+}
+
+model Formula {
+  id          String   @id @default(cuid())
+  latex       String
+  symbols     Json
+  whenToUse   String
+  derivation  String?
+  relatedIds  Json      @default("[]")
+  subtopicId  String
+  subtopic    Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+}
+
+model PracticeQuestion {
+  id            String   @id @default(cuid())
+  promptLatex   String
+  difficulty    Int
+  prerequisites Json     @default("[]")
+  answer        String
+  subtopicId    String
+  subtopic      Subtopic  @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  attempts      Attempt[]
+}
+
+model Attempt {
+  id         String           @id @default(cuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId String
+  question   PracticeQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userAnswer String
+  correct    Boolean
+  createdAt  DateTime         @default(now())
+}
+
+model Progress {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtopicId String
+  subtopic   Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  status     String
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, subtopicId])
+}

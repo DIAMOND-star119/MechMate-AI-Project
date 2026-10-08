@@ -1,0 +1,41 @@
+{
+  "subtopic": "Velocity",
+  "topic": "Kinematics",
+  "subject": "Physics",
+  "concept": "Velocity is displacement per unit time, with direction.",
+  "formulas": [
+    {
+      "id": "velocity-avg",
+      "latex": "v = \\frac{\\Delta x}{\\Delta t}",
+      "symbols": [
+        { "name": "v", "meaning": "velocity", "unit": "m/s" },
+        { "name": "Δx", "meaning": "displacement", "unit": "m" },
+        { "name": "Δt", "meaning": "time interval", "unit": "s" }
+      ],
+      "when_to_use": "Use when direction matters; otherwise use speed.",
+      "derivation": "Average rate of change of position.",
+      "related": ["speed-avg", "velocity-components"]
+    },
+    {
+      "id": "velocity-components",
+      "latex": "v_x = u\\cos\\theta,\\quad v_y = u\\sin\\theta",
+      "symbols": [
+        { "name": "vx", "meaning": "horizontal component", "unit": "m/s" },
+        { "name": "vy", "meaning": "vertical component", "unit": "m/s" },
+        { "name": "u", "meaning": "launch speed", "unit": "m/s" },
+        { "name": "θ", "meaning": "launch angle", "unit": "degrees" }
+      ],
+      "when_to_use": "Projectile motion decomposition.",
+      "derivation": "Trigonometric projection of initial velocity.",
+      "related": ["velocity-avg"]
+    }
+  ],
+  "examples": [
+    { "level": "basic", "text": "Δx = 100 m in Δt = 20 s gives v = 5 m/s.", "latex": "v = 100/20 = 5\\ \\text{m/s}" },
+    { "level": "challenging", "text": "Round trip returns to start: displacement 0, so average velocity 0 despite nonzero speed.", "latex": "v_{avg} = 0/ t = 0" }
+  ],
+  "practice": [
+    { "id": "q1", "difficulty": 1, "prompt": "Δx = 60 m, Δt = 12 s. Find v.", "answer": "5 m/s", "prerequisites": ["velocity-avg"] },
+    { "id": "q2", "difficulty": 2, "prompt": "u = 20 m/s, θ = 30°. Find vx.", "answer": "17.3 m/s", "prerequisites": ["velocity-components"] }
+  ]
+}
