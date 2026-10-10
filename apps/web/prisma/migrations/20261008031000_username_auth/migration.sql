@@ -1,0 +1,4 @@
+-- Username auth (brief §22): optional unique username per user.
+ALTER TABLE "User" ADD COLUMN "username" TEXT;
+ALTER TABLE "User" ADD COLUMN "displayUsername" TEXT;
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");

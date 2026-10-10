@@ -40,6 +40,19 @@ async function main() {
       }
     });
   }
+  // Defined learning scope for the topic (brief §5): content rows, seeded.
+  const scope = [
+    { title: "Velocity concept", kind: "note", subtopic: true },
+    { title: "Velocity formulas", kind: "formula", subtopic: true },
+    { title: "Worked examples", kind: "example", subtopic: true },
+    { title: "Practice set", kind: "practice", subtopic: false }
+  ];
+  await db.section.deleteMany({ where: { topicId: topic.id } });
+  for (const [i, s] of scope.entries()) {
+    await db.section.create({
+      data: { topicId: topic.id, title: s.title, position: i + 1, kind: s.kind, subtopicId: s.subtopic ? subtopic.id : null }
+    });
+  }
   console.log(`Seeded ${velocity.subtopic} + ${velocity.formulas.length} formulas + ${velocity.practice.length} questions`);
 }
 

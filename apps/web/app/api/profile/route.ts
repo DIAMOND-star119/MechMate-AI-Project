@@ -8,9 +8,15 @@ export async function PATCH(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
   const uid = session?.user?.id;
   if (!uid) return NextResponse.json({ error: "sign in first" }, { status: 401 });
-  const { field, level } = (await req.json()) as { field?: string; level?: string };
-  const user = await db.user.update({ where: { id: uid }, data: { field: field ?? null, level: level ?? null } });
-  return NextResponse.json({ field: user.field, level: user.level });
+  const { field, level, name } = (await req.json()) as { field?: string; level?: string; name?: string };
+  const user = await db.user.update({
+    where: { id: uid },
+    data: {
+      ...(name !== undefined ? { name: name || null } : {}),
+      ...(field !== undefined || level !== undefined ? { field: field ?? null, level: level ?? null } : {})
+    }
+  });
+  return NextResponse.json({ field: user.field, level: user.level, name: user.name });
 }
 
 export async function GET() {

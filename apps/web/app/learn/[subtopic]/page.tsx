@@ -6,6 +6,7 @@ import { PracticeRunner } from "../../../components/PracticeRunner";
 import { AskDrawer } from "../../../components/AskDrawer";
 import { NextUp } from "../../../components/NextUp";
 import { EndOfLesson } from "../../../components/EndOfLesson";
+import { TopicExtras } from "../../../components/TopicExtras";
 
 export default async function SubtopicPage({ params }: { params: Promise<{ subtopic: string }> }) {
   const { subtopic } = await params;
@@ -23,6 +24,9 @@ export default async function SubtopicPage({ params }: { params: Promise<{ subto
       </header>
 
       <div className="grid gap-4 md:grid-cols-2">
+        <section className="mm-card md:col-span-2">
+          <TopicExtras subtopic={data.subtopic} />
+        </section>
         <section className="mm-card">
           <div className="mm-eyebrow">Concept (§7.1)</div>
           <p className="text-[15px]">{data.concept}</p>

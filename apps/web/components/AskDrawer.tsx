@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RichText } from "./Math";
 
 export function AskDrawer({ subtopicId, formulaId }: { subtopicId: string; formulaId?: string }) {
   const [q, setQ] = useState("");
@@ -45,7 +46,7 @@ export function AskDrawer({ subtopicId, formulaId }: { subtopicId: string; formu
       </div>
       {answer && (
         <div className="mt-2 border-l-[3px] border-indigo-600 pl-3" aria-live="polite">
-          <p className="whitespace-pre-line text-sm">{answer.text}</p>
+          <p className="whitespace-pre-line text-sm"><RichText text={answer.text} /></p>
           <p className="mt-1 text-xs text-slate-500">
             {answer.source === "live" ? "Live explanation" : "Curated answer (install the model for richer explanations)"}
           </p>

@@ -16,6 +16,9 @@ model User {
   email         String?   @unique
   emailVerified Boolean   @default(false)
   isAnonymous   Boolean   @default(false)
+  username        String?   @unique
+  displayUsername String?
+  role            String    @default("student")
   field         String?
   level         String?
   image         String?
@@ -72,13 +75,32 @@ model Subject {
 }
 
 model Topic {
-  id        String     @id @default(cuid())
-  name      String
-  subjectId String
-  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  subtopics Subtopic[]
+  id               String     @id @default(cuid())
+  name             String
+  subjectId        String
+  subject          Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subtopics        Subtopic[]
+  sections         Section[]
+  origin           String     @default("curated")
+  validationStatus String     @default("validated")
+  sources          Source[]
 
   @@unique([subjectId, name])
+}
+
+// Defined learning scope per topic (brief §5). Content, not user state:
+// coverage is DERIVED from Progress + Attempt rows (evidence only, never clicks).
+model Section {
+  id         String   @id @default(cuid())
+  topicId    String
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title      String
+  position   Int
+  kind       String
+  subtopicId String?
+  subtopic   Subtopic? @relation(fields: [subtopicId], references: [id], onDelete: SetNull)
+
+  @@unique([topicId, position])
 }
 
 model Subtopic {
@@ -90,6 +112,7 @@ model Subtopic {
   formulas    Formula[]
   questions   PracticeQuestion[]
   progress    Progress[]
+  sections    Section[]
 
   @@unique([topicId, name])
 }
@@ -137,4 +160,28 @@ model Progress {
   updatedAt  DateTime @updatedAt
 
   @@unique([userId, subtopicId])
+}
+
+// Grounded sources for a topic (brief §17): tier-tagged, always linked.
+model Source {
+  id      String @id @default(cuid())
+  topicId String
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title   String
+  url     String
+  tier    Int
+  excerpt String @default("")
+}
+
+// Silent safety alerts (brief §§27–28): minimum necessary data only.
+// Never passwords, tokens, keys, or unrelated private information.
+model SafetyAlert {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  category  String
+  request   String
+  messages  Json     @default("[]")
+  action    String
+  status    String   @default("open")
 }

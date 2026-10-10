@@ -36,6 +36,9 @@
   ],
   "practice": [
     { "id": "q1", "difficulty": 1, "prompt": "Δx = 60 m, Δt = 12 s. Find v.", "answer": "5 m/s", "prerequisites": ["velocity-avg"] },
-    { "id": "q2", "difficulty": 2, "prompt": "u = 20 m/s, θ = 30°. Find vx.", "answer": "17.3 m/s", "prerequisites": ["velocity-components"] }
+    { "id": "q2", "difficulty": 2, "prompt": "u = 20 m/s, θ = 30°. Find vx.", "answer": "17.3 m/s", "prerequisites": ["velocity-components"] },
+    { "id": "q3", "difficulty": 1, "prompt": "Δx = 150 m, Δt = 30 s. Find v.", "answer": "5 m/s", "prerequisites": ["velocity-avg"] },
+    { "id": "q4", "difficulty": 3, "prompt": "u = 25 m/s, θ = 60°. Find vy.", "answer": "21.7 m/s", "prerequisites": ["velocity-components"] },
+    { "id": "q5", "difficulty": 2, "prompt": "vx = 12 m/s and vy = 5 m/s. Find the speed u.", "answer": "13 m/s", "prerequisites": ["velocity-components"] }
   ]
 }

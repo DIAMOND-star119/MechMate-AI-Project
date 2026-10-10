@@ -11,8 +11,8 @@ export function fallbackAnswer(question: string, subtopicId: string): { text: st
     source: "curated",
     text:
       `On "${question}": ${concept}` +
-      (f0 ? ` Key formula: ${f0.latex} — ${f0.when_to_use}` : "") +
-      `\nConnection: this matters for ${s?.subtopic ?? subtopicId} because it uses ${f0?.latex ?? "the formula above"}.`
+      (f0 ? ` Key formula: $${f0.latex}$ — ${f0.when_to_use}` : "") +
+      `\nConnection: this matters for ${s?.subtopic ?? subtopicId} because it uses ${f0 ? `$${f0.latex}$` : "the formula above"}.`
   };
 }
 
@@ -29,9 +29,9 @@ export function fallbackExplain(kind: string, subtopicId: string, formulaId?: st
     case "refresher":
       return {
         source: "curated",
-        text: `Quick refresh — ${s?.subtopic ?? subtopicId}: ${f?.latex ?? ""}\nBack to the question →`
+        text: `Quick refresh — ${s?.subtopic ?? subtopicId}: ${f ? `$${f.latex}$` : ""}\nBack to the question →`
       };
     default:
-      return { source: "curated", text: f ? `${f.latex} — ${f.when_to_use}` : "No curated detail yet." };
+      return { source: "curated", text: f ? `$${f.latex}$ — ${f.when_to_use}` : "No curated detail yet." };
   }
 }

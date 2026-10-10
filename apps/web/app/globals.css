@@ -27,6 +27,15 @@ body {
   min-height: 100vh;
 }
 
+/* Light theme (profile preference): flat light background, dark text. */
+[data-theme="light"] body {
+  background: #f4f6fc;
+}
+[data-theme="light"] body::before,
+[data-theme="light"] body::after {
+  display: none;
+}
+
 /* Black + blue marbled home background (CSS-only) */
 body::before {
   content: "";
