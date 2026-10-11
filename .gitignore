@@ -4,6 +4,9 @@ out/
 dist/
 .env
 .env.local
+.env.neon
+.netlify-token
+.netlify/
 *.log
 .DS_Store
 Thumbs.db

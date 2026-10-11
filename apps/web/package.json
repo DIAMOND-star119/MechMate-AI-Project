@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:start": "pg_ctl -D \"%USERPROFILE%\\pgsql-data\" -l \"%USERPROFILE%\\pgsql-data\\logfile.log\" -o \"-p 5433\" start",

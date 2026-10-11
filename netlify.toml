@@ -1,0 +1,11 @@
+# Netlify deploy (CLI-driven). App lives in apps/web; monorepo root only holds workspaces.
+[build]
+  base = "apps/web"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Next.js App Router API routes deploy as Netlify Functions automatically
+# via the framework integration. No functions directory needed.
