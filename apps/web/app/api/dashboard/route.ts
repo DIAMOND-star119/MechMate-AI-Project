@@ -4,11 +4,30 @@ import { auth } from "../../../lib/auth";
 import { db } from "../../../lib/db";
 import { getTopicState } from "../../../lib/topic-state";
 
+// Structural row shapes (kept in sync with the selects below).
+interface TopicRow {
+  id: string;
+  name: string;
+  subject: { name: string };
+  subtopics: { id: string; name: string }[];
+}
+
+interface ProgressRow {
+  subtopic: { id: string; name: string; topicId: string };
+  status: string;
+}
+
+interface AttemptRow {
+  correct: boolean;
+  createdAt: Date;
+  question: { subtopic: { name: string; topic: { name: string } } };
+}
+
 // Dashboard rollup (brief §§3, 7). Per-topic state (sections, completed, mastered)
 // comes from getTopicState: coverage derived from evidence, never clicks.
 export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const topics = await db.topic.findMany({
+  const topics: TopicRow[] = await db.topic.findMany({
     include: { subject: true, subtopics: { select: { id: true, name: true } } },
     orderBy: { name: "asc" }
   });
@@ -25,7 +44,7 @@ export async function GET() {
   }
 
   const uid = session.user.id;
-  const [progress, recent, states] = await Promise.all([
+  const [progress, recent, states]: [ProgressRow[], AttemptRow[], Awaited<ReturnType<typeof getTopicState>>[]] = await Promise.all([
     db.progress.findMany({ where: { userId: uid }, include: { subtopic: { select: { id: true, name: true, topicId: true } } } }),
     db.attempt.findMany({
       where: { userId: uid },
