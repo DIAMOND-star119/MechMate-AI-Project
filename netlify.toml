@@ -1,11 +1,13 @@
-# Netlify deploy (CLI-driven). App lives in apps/web; monorepo root only holds workspaces.
+# Netlify deploy. App lives in apps/web as a standalone install (no npm
+# workspaces hoisting — hoisted Next.js breaks the Next Runtime bundling).
+# In the Netlify UI set: Base directory = (unset), Package directory = apps/web,
+# Build command = npm run build, Publish directory = apps/web/.next.
 [build]
-  base = "apps/web"
   command = "npm run build"
-  publish = ".next"
+  publish = "apps/web/.next"
 
 [build.environment]
   NODE_VERSION = "24"
 
-# Next.js App Router API routes deploy as Netlify Functions automatically
-# via the framework integration. No functions directory needed.
+# Next.js App Router pages + API routes deploy as Netlify Functions
+# automatically via the framework integration. No functions directory needed.
