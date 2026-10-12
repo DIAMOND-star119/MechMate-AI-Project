@@ -21,6 +21,19 @@ const extraOrigins = (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "")
   .map((s) => s.trim())
   .filter(Boolean);
 
+// Vercel auto-provides every address that can reach this deployment: the
+// unique deployment URL, the stable branch URL, and the production domain.
+// Trusting all of them means login works no matter which address is opened,
+// even after redeploys change the deployment URL. All three belong to this
+// project, so nothing foreign is trusted.
+const vercelOrigins = [
+  process.env.VERCEL_URL,
+  process.env.VERCEL_BRANCH_URL,
+  process.env.VERCEL_PROJECT_PRODUCTION_URL,
+]
+  .filter((h): h is string => !!h)
+  .map((h) => `https://${h}`);
+
 // Identity (brief §§22–24): username+password signup, email never required.
 // Email sign-in and anonymous guest keep working; guests can upgrade to a
 // username account without losing progress (see /api/account/merge).
@@ -39,5 +52,5 @@ export const auth = betterAuth({
   // Without this, every browser auth POST from the production origin is
   // rejected with 403 INVALID_ORIGIN whenever BETTER_AUTH_URL is unset or
   // stale. The primary origin is always trusted; extras come from the env.
-  trustedOrigins: [siteURL, ...extraOrigins],
+  trustedOrigins: [siteURL, ...vercelOrigins, ...extraOrigins],
 });
