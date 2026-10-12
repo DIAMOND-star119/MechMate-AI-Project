@@ -14,6 +14,27 @@ export function AuthBar() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
 
+  // Map Better Auth error codes to safe, actionable UI messages. Raw server
+  // details stay in server logs; the UI never renders tokens or internals.
+  function friendlyError(code: string | undefined | null, fallback: string) {
+    const c = (code ?? "").toUpperCase();
+    if (/INVALID_ORIGIN|INVALID_CALLBACK|TRUSTED/i.test(c))
+      return "Sign-in service rejected the request (site configuration). Please retry; if it persists, the deployment needs its auth URL updated.";
+    if (/INVALID_USERNAME_OR_PASSWORD|INVALID_EMAIL_OR_PASSWORD|UNAUTHORIZED/i.test(c))
+      return "Invalid username or password.";
+    if (/USERNAME_IS_ALREADY_TAKEN|USER_ALREADY_EXISTS|DUPLICATE|TAKEN|EXISTS/i.test(c))
+      return "";
+    if (/USERNAME_TOO_SHORT|INVALID_USERNAME/i.test(c))
+      return "That username isn't valid (3–30 characters, letters/numbers/._-).";
+    if (/PASSWORD_TOO_SHORT|PASSWORD_TOO_LONG/i.test(c))
+      return "Password must be 8–128 characters.";
+    if (/INVALID_EMAIL/i.test(c))
+      return "That username can't be used yet — try a different one.";
+    if (/RATE_LIMIT|TOO_MANY/i.test(c))
+      return "Too many attempts. Wait a minute and try again.";
+    return fallback;
+  }
+
   if (isPending) return <p className="text-sm text-indigo-200">…</p>;
   const raw = session?.user;
   const user = raw as undefined | (NonNullable<typeof raw> & { isAnonymous?: boolean; username?: string });
@@ -42,15 +63,15 @@ export function AuthBar() {
         const placeholder = `${username.trim().toLowerCase()}@mechmate.local`;
         const r = await authClient.signUp.email({ email: placeholder, username: username.trim(), password, name: username.trim() } as any);
         if (r.error) {
-          if (/taken|exists|duplicate/i.test(r.error.message ?? "")) {
+          if (/taken|exists|duplicate/i.test(`${r.error.code ?? ""} ${r.error.message ?? ""}`)) {
             setMode("in");
             return setError("That username already has an account — switched to Sign in. Enter your password.");
           }
-          return setError(r.error.message ?? "Sign up failed.");
+          return setError(friendlyError((r.error as any).code, r.error.message ?? "Sign up failed."));
         }
       } else {
         const r = await (authClient.signIn as any).username({ username: username.trim(), password, rememberMe: true });
-        if (r.error) return setError(r.error.message ?? "Sign in failed.");
+        if (r.error) return setError(friendlyError((r.error as any).code, r.error.message ?? "Sign in failed."));
       }
       if (anonId) {
         await fetch("/api/account/merge", {
@@ -63,7 +84,9 @@ export function AuthBar() {
       setPassword("");
       setConfirm("");
     } catch {
-      setError("Something went wrong. Try again.");
+      // Network-level failure (server unreachable, TLS/DNS): the only case
+      // where there is no server error object at all.
+      setError("Couldn't reach the server. Check your connection and try again.");
     }
   }
 
