@@ -28,6 +28,7 @@ model User {
   accounts      Account[]
   attempts      Attempt[]
   progress      Progress[]
+  conversations Conversation[]
 }
 
 model Session {
@@ -160,6 +161,37 @@ model Progress {
   updatedAt  DateTime @updatedAt
 
   @@unique([userId, subtopicId])
+}
+
+// Persistent study conversations (ChatGPT-style management, MechMate identity).
+// Ownership is enforced server-side on every operation. Messages carry an
+// explicit sequence so order restores exactly; AI replies are saved alongside.
+model Conversation {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("New chat")
+  topic     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  text           String
+  seq            Int
+  source         String?
+  key            String?   @unique
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, seq])
+  @@index([conversationId, seq])
 }
 
 // Grounded sources for a topic (brief §17): tier-tagged, always linked.

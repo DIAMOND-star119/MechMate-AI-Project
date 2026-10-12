@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ text: refusalText(mod.level, mod.category), source: "moderation", refused: true });
   }
   try {
-    const text = await ai.answerQuestion(question.trim(), { subtopicId, formulaId });
+    const text = await ai.answerQuestion(question.trim(), { subtopicId, formulaId }, history ?? []);
     return NextResponse.json({ text, source: "live" });
   } catch {
     return NextResponse.json(fallbackAnswer(question.trim(), subtopicId));

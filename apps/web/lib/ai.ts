@@ -9,13 +9,19 @@ export interface AIContext {
   formulaId?: string;
 }
 
+export interface ChatHistory {
+  role: string;
+  text: string;
+}
+
 export interface AIProvider {
   readonly id: string;
   explainConcept(concept: string, ctx: AIContext): Promise<string>;
   expandFormula(formulaLatex: string, ctx: AIContext): Promise<string>;
-  answerQuestion(question: string, ctx: AIContext): Promise<string>;
+  answerQuestion(question: string, ctx: AIContext, history?: ChatHistory[]): Promise<string>;
   refresher(concept: string, ctx: AIContext): Promise<string>;
   draftTopic(request: string): Promise<TopicDraft>;
+  makeTitle(texts: string[]): Promise<string>;
 }
 
 export interface TopicDraft {
@@ -55,11 +61,26 @@ export class OllamaProvider implements AIProvider {
   expandFormula(formulaLatex: string, ctx: AIContext) {
     return this.generate(`Explain what this formula means and when to use it (${formulaLatex}) in subtopic ${ctx.subtopicId}.`);
   }
-  answerQuestion(question: string, ctx: AIContext) {
-    return this.generate(`Answer exactly: ${question}. Then add one line connecting it to subtopic ${ctx.subtopicId}${ctx.formulaId ? `, formula ${ctx.formulaId}` : ""}.`);
+  answerQuestion(question: string, ctx: AIContext, history: ChatHistory[] = []) {
+    const prior = history
+      .slice(-12)
+      .map((m) => `${m.role === "assistant" ? "Tutor" : "Student"}: ${m.text.slice(0, 800)}`)
+      .join("\n");
+    const context = prior
+      ? `Previous conversation (same topic, in order):\n${prior}\n\nResolve follow-ups ("these formulas", "that symbol", "another example", "harder", "continue") DIRECTLY from it using the same notation. Ask for clarification only if genuinely ambiguous. Now answer: ${question}`
+      : `Answer exactly: ${question}`;
+    return this.generate(`${context}. Then add one line connecting it to subtopic ${ctx.subtopicId}${ctx.formulaId ? `, formula ${ctx.formulaId}` : ""}.`);
   }
   refresher(concept: string, ctx: AIContext) {
     return this.generate(`Give a 2-line refresher on ${concept} needed for subtopic ${ctx.subtopicId}, then say "back to the question".`);
+  }
+  async makeTitle(texts: string[]): Promise<string> {
+    const raw = await this.generate(
+      `Give this study conversation a short title (max 6 words, no quotes, no punctuation at the end), based on these opening messages:\n${texts.slice(0, 4).join("\n")}`
+    );
+    const clean = raw.replace(/^["'“”]+|["'“”.:;!?]+$/g, "").trim().slice(0, 80);
+    if (!clean) throw new Error("empty title");
+    return clean;
   }
   async draftTopic(request: string): Promise<TopicDraft> {
     const raw = await this.generate(
