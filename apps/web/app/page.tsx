@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "../components/Math";
 import { SearchBox } from "../components/SearchBox";
 import { AuthBar } from "../components/AuthBar";
+import { InstallButton } from "../components/InstallButton";
 import { OnboardingForm } from "../components/OnboardingForm";
 import { Dashboard } from "../components/Dashboard";
 import { RequestTopic } from "../components/RequestTopic";
@@ -17,7 +18,10 @@ export default function Home() {
             <p className="text-sm text-indigo-200">Search a topic. Understand the formulas. Apply them.</p>
           </div>
         </div>
-        <AuthBar />
+        <div className="flex flex-col items-end gap-2">
+          <AuthBar />
+          <InstallButton />
+        </div>
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         <Dashboard />

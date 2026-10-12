@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Math } from "./Math";
-import { sortByDifficulty, nextLevel, summarize, correctionLine, type PracticeItem, type AttemptResult } from "../lib/practice";
+import { sortByDifficulty, nextLevel, summarize, correctionLine, answersMatch, type PracticeItem, type AttemptResult } from "../lib/practice";
 import { track } from "../lib/analytics";
 
 export function PracticeRunner({ items, subtopic }: { items: PracticeItem[]; subtopic: string }) {
@@ -19,13 +19,9 @@ export function PracticeRunner({ items, subtopic }: { items: PracticeItem[]; sub
   const done = results.length >= ordered.length && !retest;
   const summary = summarize(results);
 
-  function normalize(s: string) {
-    return s.trim().toLowerCase();
-  }
-
   function submit() {
     if (!current || !given.trim()) return;
-    const correct = normalize(given) === normalize(current.answer);
+    const correct = answersMatch(given, current.answer);
     const r: AttemptResult = { id: current.id, correct, prerequisites: current.prerequisites, answer: current.answer, given: given.trim() };
     const next = [...results, r];
     setResults(next);

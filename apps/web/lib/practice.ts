@@ -48,3 +48,31 @@ export function summarize(results: AttemptResult[]): Summary {
 export function correctionLine(r: AttemptResult): string {
   return `Correct answer: ${r.answer}. You gave "${r.given || "—"}". Review: ${r.prerequisites.join(", ") || "the concept above"}.`;
 }
+
+// Fair grading: numeric answers compare by VALUE within tolerance, not by
+// exact string. "17.32 m/s" counts for "17.3 m/s". Units must not conflict:
+// equal (after normalization) or omitted on the student's side both pass.
+export function answersMatch(given: string, expected: string): boolean {
+  const g = given.trim().toLowerCase();
+  const e = expected.trim().toLowerCase();
+  if (g === e) return true;
+  const gn = parseNumeric(g);
+  const en = parseNumeric(e);
+  if (!gn || !en) return false;
+  if (gn.unit && en.unit && gn.unit !== en.unit) return false;
+  const tol = 0.05 + 0.005 * Math.abs(en.value);
+  return Math.abs(gn.value - en.value) <= tol;
+}
+
+function parseNumeric(s: string): { value: number; unit: string } | null {
+  const m = s.match(/-?\d+(?:\.\d+)?/);
+  if (!m || m === null) return null;
+  const value = Number(m[0]);
+  if (!Number.isFinite(value)) return null;
+  const unit = s
+    .slice(m.index! + m[0].length)
+    .replace(/[\s.,;]+$/g, "")
+    .replace(/\s+/g, "")
+    .replace(/\^2/g, "²");
+  return { value, unit };
+}
