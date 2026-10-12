@@ -41,7 +41,13 @@ export function AuthBar() {
         // the user never sees; a real recovery email can replace it in Profile.
         const placeholder = `${username.trim().toLowerCase()}@mechmate.local`;
         const r = await authClient.signUp.email({ email: placeholder, username: username.trim(), password, name: username.trim() } as any);
-        if (r.error) return setError(r.error.message ?? "Sign up failed.");
+        if (r.error) {
+          if (/taken|exists|duplicate/i.test(r.error.message ?? "")) {
+            setMode("in");
+            return setError("That username already has an account — switched to Sign in. Enter your password.");
+          }
+          return setError(r.error.message ?? "Sign up failed.");
+        }
       } else {
         const r = await (authClient.signIn as any).username({ username: username.trim(), password, rememberMe: true });
         if (r.error) return setError(r.error.message ?? "Sign in failed.");
