@@ -12,8 +12,11 @@ async function userId() {
 export async function GET() {
   const uid = await userId();
   if (!uid) return NextResponse.json({ progress: [] });
-  const progress = await db.progress.findMany({ where: { userId: uid } });
-  return NextResponse.json({ progress });
+  const progress = await db.progress.findMany({
+    where: { userId: uid },
+    include: { subtopic: { select: { name: true } } }
+  });
+  return NextResponse.json({ progress: progress.map((p) => ({ status: p.status, subtopic: p.subtopic.name })) });
 }
 
 export async function POST(req: Request) {

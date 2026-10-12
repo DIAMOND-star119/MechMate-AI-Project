@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSubtopic } from "../../../lib/content";
+import { db } from "../../../lib/db";
 import { Math, Logo } from "../../../components/Math";
 import { PracticeRunner } from "../../../components/PracticeRunner";
 import { AskDrawer } from "../../../components/AskDrawer";
@@ -10,8 +11,40 @@ import { TopicExtras } from "../../../components/TopicExtras";
 
 export default async function SubtopicPage({ params }: { params: Promise<{ subtopic: string }> }) {
   const { subtopic } = await params;
-  const data = getSubtopic(subtopic);
-  if (!data) notFound();
+  let data = getSubtopic(subtopic);
+  if (!data) {
+    // AI-created subtopics live in Postgres, not the seed JSON.
+    // A dead database must 404, never 500 the lesson.
+    try {
+      const row = await db.subtopic.findFirst({
+        where: { name: { equals: subtopic, mode: "insensitive" } },
+        include: { topic: { include: { subject: true } }, formulas: true, questions: true }
+      });
+      if (!row) notFound();
+    data = {
+      subject: row.topic.subject.name,
+      topic: row.topic.name,
+      subtopic: row.name,
+      concept: row.concept,
+      formulas: row.formulas.map((f) => ({
+        id: f.id,
+        latex: f.latex,
+        symbols: (f.symbols as { name: string; meaning: string; unit: string }[]),
+        when_to_use: f.whenToUse
+      })),
+      examples: [] as { level: "basic" | "challenging"; text: string; latex: string }[],
+      practice: row.questions.map((q) => ({
+        id: q.id,
+        difficulty: q.difficulty,
+        prompt: q.promptLatex,
+        answer: q.answer,
+        prerequisites: ((q.prerequisites as string[]) ?? [])
+      }))
+    };
+    } catch {
+      notFound();
+    }
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-5 pb-20 pt-7">
@@ -57,6 +90,9 @@ export default async function SubtopicPage({ params }: { params: Promise<{ subto
 
         <section className="mm-card">
           <div className="mm-eyebrow">Examples (§8 — basic → challenging)</div>
+          {data.examples.length === 0 && (
+            <p className="text-sm text-slate-500">Worked examples for this AI-built subtopic are on the way — ask the companion for one meanwhile.</p>
+          )}
           {data.examples.map((e) => (
             <div key={e.level} className="mb-3">
               <h3 className="font-bold capitalize">{e.level}</h3>

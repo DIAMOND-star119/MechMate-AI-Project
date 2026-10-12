@@ -32,15 +32,14 @@ export async function GET() {
     orderBy: { name: "asc" }
   });
 
+  const catalogue = topics.map((t) => ({
+    topic: t.name,
+    subject: t.subject.name,
+    subtopics: t.subtopics.map((s) => s.name)
+  }));
+
   if (!session?.user?.id) {
-    return NextResponse.json({
-      signedIn: false,
-      catalogue: topics.map((t) => ({
-        topic: t.name,
-        subject: t.subject.name,
-        subtopics: t.subtopics.map((s) => s.name)
-      }))
-    });
+    return NextResponse.json({ signedIn: false, catalogue });
   }
 
   const uid = session.user.id;
@@ -84,6 +83,7 @@ export async function GET() {
 
   return NextResponse.json({
     signedIn: true,
+    catalogue,
     overall,
     topics: perTopic,
     current: started,

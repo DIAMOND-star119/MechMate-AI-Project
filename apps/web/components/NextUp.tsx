@@ -3,19 +3,30 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-// Weakest-first: struggling → unencountered → mastered. Free explore always.
-const ORDER = ["Velocity", "Displacement", "Acceleration"];
-
+// Weakest-first over subtopics that ACTUALLY exist (from the catalogue).
+// Dead links are impossible: only real subtopics are ever linked.
 export function NextUp() {
+  const [names, setNames] = useState<string[]>(["Velocity"]);
   const [statusByName, setStatusByName] = useState<Record<string, string>>({});
   useEffect(() => {
-    fetch("/api/progress").then((r) => r.json()).then((d) => {
-      const map: Record<string, string> = {};
-      for (const p of d.progress ?? []) map[p.subtopicId] = p.status;
-      setStatusByName(map);
-    }).catch(() => {});
+    fetch("/api/dashboard")
+      .then((r) => r.json())
+      .then((d) => {
+        const cat = (d.catalogue ?? []) as { subtopics: string[] }[];
+        const all = cat.flatMap((c) => c.subtopics);
+        if (all.length) setNames(all);
+      })
+      .catch(() => {});
+    fetch("/api/progress")
+      .then((r) => r.json())
+      .then((d) => {
+        const map: Record<string, string> = {};
+        for (const p of (d.progress ?? []) as { status: string; subtopic: string }[]) map[p.subtopic] = p.status;
+        setStatusByName(map);
+      })
+      .catch(() => {});
   }, []);
-  const ranked = [...ORDER].sort((a, b) => {
+  const ranked = [...names].sort((a, b) => {
     const rank = (s?: string) => (s === "struggling" ? 0 : s === undefined ? 1 : 2);
     return rank(statusByName[a]) - rank(statusByName[b]);
   });
