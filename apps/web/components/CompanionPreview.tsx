@@ -307,7 +307,7 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             <button className="rounded-full border bg-white px-3 py-1 text-sm" onClick={() => send("Explain that differently — use an analogy or a simpler example.")} disabled={busy || !activeTopic}>I don&apos;t understand</button>
-            {activeTopic && <Link className="rounded-full border bg-white px-3 py-1 text-sm text-indigo-700" href={`/learn/${activeTopic.toLowerCase()}`}>Study notes · Practice →</Link>}
+            {activeTopic && <Link className="rounded-full border bg-white px-3 py-1 text-sm text-indigo-700" href={`/learn/${encodeURIComponent(activeTopic.toLowerCase())}`}>Study notes · Practice →</Link>}
           </div>
         </div>
       </div>

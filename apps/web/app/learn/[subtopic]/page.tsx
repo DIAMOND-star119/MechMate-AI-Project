@@ -11,13 +11,22 @@ import { TopicExtras } from "../../../components/TopicExtras";
 
 export default async function SubtopicPage({ params }: { params: Promise<{ subtopic: string }> }) {
   const { subtopic } = await params;
-  let data = getSubtopic(subtopic);
+  // Route params arrive still URL-encoded when the name contains spaces
+  // ("spring%20constant"): decode before every lookup, or every
+  // multi-word lesson 404s even though its row exists.
+  let slug = subtopic;
+  try {
+    slug = decodeURIComponent(subtopic);
+  } catch {
+    slug = subtopic;
+  }
+  let data = getSubtopic(slug);
   if (!data) {
     // AI-created subtopics live in Postgres, not the seed JSON.
     // A dead database must 404, never 500 the lesson.
     try {
       const row = await db.subtopic.findFirst({
-        where: { name: { equals: subtopic, mode: "insensitive" } },
+        where: { name: { equals: slug, mode: "insensitive" } },
         include: { topic: { include: { subject: true } }, formulas: true, questions: true }
       });
       if (!row) notFound();

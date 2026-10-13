@@ -1,0 +1,43 @@
+{
+  "subtopic": "Acceleration",
+  "topic": "Kinematics",
+  "subject": "Physics",
+  "concept": "Acceleration is the rate of change of velocity with time. Speeding up, slowing down, and changing direction are all acceleration. Near Earth, everything falls with g = 9.8 m/s².",
+  "formulas": [
+    {
+      "id": "acceleration-def",
+      "latex": "a = \\frac{\\Delta v}{\\Delta t}",
+      "symbols": [
+        { "name": "a", "meaning": "acceleration", "unit": "m/s²" },
+        { "name": "Δv", "meaning": "change in velocity", "unit": "m/s" },
+        { "name": "Δt", "meaning": "time interval", "unit": "s" }
+      ],
+      "when_to_use": "Any change of velocity over a known time, including slowing down (negative a).",
+      "derivation": "Velocity change divided by the time it took.",
+      "related": ["free-fall", "velocity-avg"]
+    },
+    {
+      "id": "free-fall",
+      "latex": "v = gt",
+      "symbols": [
+        { "name": "v", "meaning": "velocity after falling", "unit": "m/s" },
+        { "name": "g", "meaning": "acceleration of free fall", "unit": "m/s²" },
+        { "name": "t", "meaning": "fall time", "unit": "s" }
+      ],
+      "when_to_use": "Objects dropped from rest (starting velocity zero), ignoring air resistance.",
+      "derivation": "Constant acceleration g applied for time t, from rest.",
+      "related": ["acceleration-def"]
+    }
+  ],
+  "examples": [
+    { "level": "basic", "text": "Velocity rises 0 → 20 m/s in 5 s: a = 4 m/s².", "latex": "a = 20/5 = 4\\ \\text{m/s}^2" },
+    { "level": "challenging", "text": "Braking 12 → 0 m/s in 4 s gives a = −3 m/s²: the minus means against motion.", "latex": "a = (0 - 12)/4 = -3\\ \\text{m/s}^2" }
+  ],
+  "practice": [
+    { "id": "q1", "difficulty": 1, "prompt": "Velocity changes 0 → 20 m/s in 5 s. Find the acceleration.", "answer": "4 m/s²", "prerequisites": ["acceleration-def"] },
+    { "id": "q2", "difficulty": 1, "prompt": "A stone falls from rest for 3 s (g = 9.8 m/s²). Find its velocity.", "answer": "29.4 m/s", "prerequisites": ["free-fall"] },
+    { "id": "q3", "difficulty": 2, "prompt": "Velocity changes 12 → 0 m/s in 4 s. Find the acceleration (keep the sign).", "answer": "-3 m/s²", "prerequisites": ["acceleration-def"] },
+    { "id": "q4", "difficulty": 2, "prompt": "Velocity changes 5 → 25 m/s in 8 s. Find the acceleration.", "answer": "2.5 m/s²", "prerequisites": ["acceleration-def"] },
+    { "id": "q5", "difficulty": 3, "prompt": "A stone falls from rest for 5 s (g = 9.8 m/s²). Find its velocity.", "answer": "49 m/s", "prerequisites": ["free-fall"] }
+  ]
+}

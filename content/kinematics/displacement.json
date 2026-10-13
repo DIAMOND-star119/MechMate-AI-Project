@@ -1,0 +1,43 @@
+{
+  "subtopic": "Displacement",
+  "topic": "Kinematics",
+  "subject": "Physics",
+  "concept": "Displacement is the straight-line change in position from start to finish, with direction. Distance is the total path travelled and is always positive — displacement can be zero or negative.",
+  "formulas": [
+    {
+      "id": "displacement-def",
+      "latex": "\\Delta x = x - x_0",
+      "symbols": [
+        { "name": "Δx", "meaning": "displacement", "unit": "m" },
+        { "name": "x", "meaning": "final position", "unit": "m" },
+        { "name": "x₀", "meaning": "starting position", "unit": "m" }
+      ],
+      "when_to_use": "Any straight-line motion when start and end positions are known.",
+      "derivation": "Final minus initial position, keeping the sign for direction.",
+      "related": ["avg-speed"]
+    },
+    {
+      "id": "avg-speed",
+      "latex": "v = \\frac{d}{t}",
+      "symbols": [
+        { "name": "v", "meaning": "average speed", "unit": "m/s" },
+        { "name": "d", "meaning": "total distance travelled", "unit": "m" },
+        { "name": "t", "meaning": "time taken", "unit": "s" }
+      ],
+      "when_to_use": "Rate of travel along the path, ignoring direction.",
+      "derivation": "Total path length divided by total time.",
+      "related": ["displacement-def", "velocity-avg"]
+    }
+  ],
+  "examples": [
+    { "level": "basic", "text": "Walk from x₀ = 2 m to x = 17 m: displacement Δx = 15 m.", "latex": "\\Delta x = 17 - 2 = 15\\ \\text{m}" },
+    { "level": "challenging", "text": "A 400 m lap brings you back to the start: distance 400 m, but displacement 0 m.", "latex": "\\Delta x = 0\\ \\text{m}" }
+  ],
+  "practice": [
+    { "id": "q1", "difficulty": 1, "prompt": "x₀ = 2 m, x = 17 m. Find the displacement Δx.", "answer": "15 m", "prerequisites": ["displacement-def"] },
+    { "id": "q2", "difficulty": 1, "prompt": "Distance d = 250 m in time t = 50 s. Find the average speed.", "answer": "5 m/s", "prerequisites": ["avg-speed"] },
+    { "id": "q3", "difficulty": 2, "prompt": "x₀ = 4 m, x = 30 m. Find the displacement Δx.", "answer": "26 m", "prerequisites": ["displacement-def"] },
+    { "id": "q4", "difficulty": 2, "prompt": "Distance d = 960 m in time t = 240 s. Find the average speed.", "answer": "4 m/s", "prerequisites": ["avg-speed"] },
+    { "id": "q5", "difficulty": 3, "prompt": "x₀ = 100 m, x = 35 m. Find the displacement Δx (keep the sign).", "answer": "-65 m", "prerequisites": ["displacement-def"] }
+  ]
+}

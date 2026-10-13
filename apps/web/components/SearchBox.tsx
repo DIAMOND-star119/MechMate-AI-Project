@@ -21,7 +21,7 @@ export function SearchBox() {
       <ul className="mt-3 space-y-2 text-sm">
         {results.map((r) => (
           <li key={r.subtopic} className="rounded-lg border p-2.5">
-            <Link className="font-bold text-indigo-700 underline" href={`/learn/${r.subtopic.toLowerCase()}`}>
+            <Link className="font-bold text-indigo-700 underline" href={`/learn/${encodeURIComponent(r.subtopic.toLowerCase())}`}>
               {r.subtopic}
             </Link>
             <span className="text-slate-500"> — {r.topic} · {r.subject}</span>

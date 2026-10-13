@@ -72,7 +72,7 @@ export async function GET() {
       attempts: st.attempts,
       struggling,
       started: st.sections.some((s) => s.covered),
-      continueHref: continueSubtopic ? `/learn/${continueSubtopic.name.toLowerCase()}` : null
+      continueHref: continueSubtopic ? `/learn/${encodeURIComponent(continueSubtopic.name.toLowerCase())}` : null
     };
   });
 

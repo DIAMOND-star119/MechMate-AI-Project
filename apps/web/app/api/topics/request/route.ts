@@ -65,6 +65,27 @@ export async function POST(req: Request) {
       create: { name: st.name.slice(0, 120), concept: st.concept.slice(0, 1000), topicId: topic.id }
     });
     subs.push(sub);
+    // A concept-only lesson teaches nothing: fill in formulas + practice on
+    // first creation. Never fails the request — worst case the lesson keeps
+    // its concept and the companion covers the rest.
+    try {
+      const existingContent = await db.formula.count({ where: { subtopicId: sub.id } });
+      if (existingContent === 0) {
+        const lesson = await ai.draftLesson(sub.name, sub.concept, draft.topic);
+        for (const f of lesson.formulas) {
+          await db.formula.create({
+            data: { latex: f.latex, symbols: f.symbols, whenToUse: f.when_to_use, subtopicId: sub.id }
+          });
+        }
+        for (const q of lesson.practice) {
+          await db.practiceQuestion.create({
+            data: { promptLatex: q.prompt, difficulty: q.difficulty, prerequisites: [], answer: q.answer, subtopicId: sub.id }
+          });
+        }
+      }
+    } catch {
+      // Keep the concept-only lesson rather than failing the whole request.
+    }
   }
   await db.source.deleteMany({ where: { topicId: topic.id } });
   for (const s of sources.slice(0, 6)) {
@@ -75,7 +96,7 @@ export async function POST(req: Request) {
     status: validated ? "ready" : "unvalidated",
     topic: draft.topic,
     subject: draft.subject,
-    href: subs[0] ? `/learn/${subs[0].name.toLowerCase()}` : null,
+    href: subs[0] ? `/learn/${encodeURIComponent(subs[0].name.toLowerCase())}` : null,
     notice: validated
       ? coverage === "thin"
         ? "Limited sources found — treat details as provisional and check the linked sources."

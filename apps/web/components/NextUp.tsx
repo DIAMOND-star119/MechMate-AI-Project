@@ -36,7 +36,7 @@ export function NextUp() {
       <ul className="mt-2 space-y-1 text-sm">
         {ranked.map((n) => (
           <li key={n}>
-            <Link className="text-indigo-700 underline" href={`/learn/${n.toLowerCase()}`}>{n}</Link>
+            <Link className="text-indigo-700 underline" href={`/learn/${encodeURIComponent(n.toLowerCase())}`}>{n}</Link>
             {statusByName[n] && <span className="ml-2 text-xs text-slate-500">{statusByName[n]}</span>}
           </li>
         ))}

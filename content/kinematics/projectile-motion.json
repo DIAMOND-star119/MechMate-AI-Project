@@ -1,0 +1,58 @@
+{
+  "subtopic": "Projectile Motion",
+  "topic": "Kinematics",
+  "subject": "Physics",
+  "concept": "A projectile moves horizontally at constant velocity while gravity accelerates it downward. Split the launch into horizontal and vertical parts, solve each with constant-acceleration equations, then combine.",
+  "formulas": [
+    {
+      "id": "projectile-time",
+      "latex": "T = \\frac{2u\\sin\\theta}{g}",
+      "symbols": [
+        { "name": "T", "meaning": "total time of flight", "unit": "s" },
+        { "name": "u", "meaning": "launch speed", "unit": "m/s" },
+        { "name": "θ", "meaning": "launch angle above horizontal", "unit": "degrees" },
+        { "name": "g", "meaning": "acceleration of free fall", "unit": "m/s²" }
+      ],
+      "when_to_use": "How long the projectile stays in the air (lands at launch height).",
+      "derivation": "Vertical motion up then down: twice the time to reach the top.",
+      "related": ["projectile-range", "projectile-height"]
+    },
+    {
+      "id": "projectile-range",
+      "latex": "R = \\frac{u^2\\sin 2\\theta}{g}",
+      "symbols": [
+        { "name": "R", "meaning": "horizontal range", "unit": "m" },
+        { "name": "u", "meaning": "launch speed", "unit": "m/s" },
+        { "name": "θ", "meaning": "launch angle above horizontal", "unit": "degrees" },
+        { "name": "g", "meaning": "acceleration of free fall", "unit": "m/s²" }
+      ],
+      "when_to_use": "How far it lands (same height). Maximum range at 45°.",
+      "derivation": "Horizontal speed times time of flight.",
+      "related": ["projectile-time", "projectile-height"]
+    },
+    {
+      "id": "projectile-height",
+      "latex": "H = \\frac{(u\\sin\\theta)^2}{2g}",
+      "symbols": [
+        { "name": "H", "meaning": "maximum height", "unit": "m" },
+        { "name": "u", "meaning": "launch speed", "unit": "m/s" },
+        { "name": "θ", "meaning": "launch angle above horizontal", "unit": "degrees" },
+        { "name": "g", "meaning": "acceleration of free fall", "unit": "m/s²" }
+      ],
+      "when_to_use": "Peak height, where vertical velocity is momentarily zero.",
+      "derivation": "v² = u² + 2as applied vertically with v = 0 at the top.",
+      "related": ["projectile-time", "projectile-range"]
+    }
+  ],
+  "examples": [
+    { "level": "basic", "text": "Ball thrown straight up, u = 14 m/s: peak H = 14²/(2×9.8) = 10 m.", "latex": "H = 14^2/(2 \\times 9.8) = 10\\ \\text{m}" },
+    { "level": "challenging", "text": "u = 28 m/s at 45°: R = 28²×sin90°/9.8 = 80 m — the 45° maximum.", "latex": "R = 28^2/9.8 = 80\\ \\text{m}" }
+  ],
+  "practice": [
+    { "id": "q1", "difficulty": 1, "prompt": "Ball thrown straight up at u = 14 m/s (g = 9.8 m/s²). Find the maximum height H.", "answer": "10 m", "prerequisites": ["projectile-height"] },
+    { "id": "q2", "difficulty": 1, "prompt": "Ball thrown straight up at u = 19.6 m/s (g = 9.8 m/s²). Find the time of flight T.", "answer": "4 s", "prerequisites": ["projectile-time"] },
+    { "id": "q3", "difficulty": 2, "prompt": "Projectile launched at u = 28 m/s, θ = 45° (g = 9.8 m/s²). Find the range R.", "answer": "80 m", "prerequisites": ["projectile-range"] },
+    { "id": "q4", "difficulty": 2, "prompt": "Projectile launched at u = 9.8 m/s, θ = 30° (g = 9.8 m/s²). Find the time of flight T.", "answer": "1 s", "prerequisites": ["projectile-time"] },
+    { "id": "q5", "difficulty": 3, "prompt": "Projectile launched at u = 19.6 m/s, θ = 30° (g = 9.8 m/s²). Find the maximum height H.", "answer": "4.9 m", "prerequisites": ["projectile-height"] }
+  ]
+}

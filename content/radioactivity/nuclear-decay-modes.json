@@ -1,0 +1,55 @@
+{
+  "subtopic": "Nuclear decay modes",
+  "topic": "Fundamentals of Nuclear Decay",
+  "subject": "Radioactivity",
+  "concept": "Unstable nuclei transform by alpha, beta, or gamma decay: alpha sheds 2 protons and 2 neutrons, beta converts a neutron into a proton, gamma releases energy with no particle change.",
+  "formulas": [
+    {
+      "id": "alpha-decay",
+      "latex": "^{A}_{Z}X \\to ^{A-4}_{Z-2}Y + ^{4}_{2}He",
+      "symbols": [
+        { "name": "A", "meaning": "mass number (nucleons)", "unit": "count" },
+        { "name": "Z", "meaning": "atomic number (protons)", "unit": "count" },
+        { "name": "⁴₂He", "meaning": "alpha particle", "unit": "count" }
+      ],
+      "when_to_use": "Heavy unstable nuclei shedding mass: mass number drops by 4, atomic number by 2.",
+      "derivation": "Nucleon and charge conservation: 4 nucleons and 2 protons leave with the alpha particle.",
+      "related": ["beta-decay", "gamma-decay"]
+    },
+    {
+      "id": "beta-decay",
+      "latex": "n \\to p + e^- + \\bar{\\nu}_e",
+      "symbols": [
+        { "name": "n", "meaning": "neutron in the nucleus", "unit": "count" },
+        { "name": "p", "meaning": "proton left behind", "unit": "count" },
+        { "name": "e⁻", "meaning": "emitted beta electron", "unit": "count" }
+      ],
+      "when_to_use": "Neutron-rich nuclei: mass number unchanged, atomic number rises by 1.",
+      "derivation": "Weak interaction converts a neutron; charge balances via the emitted electron.",
+      "related": ["alpha-decay", "gamma-decay"]
+    },
+    {
+      "id": "gamma-decay",
+      "latex": "^{A}_{Z}X^* \\to ^{A}_{Z}X + \\gamma",
+      "symbols": [
+        { "name": "X*", "meaning": "nucleus in excited state", "unit": "count" },
+        { "name": "X", "meaning": "same nucleus, lower energy", "unit": "count" },
+        { "name": "γ", "meaning": "emitted gamma photon", "unit": "count" }
+      ],
+      "when_to_use": "Excited nucleus shedding energy: A and Z both unchanged.",
+      "derivation": "Energy conservation only — no nucleons move.",
+      "related": ["alpha-decay", "beta-decay"]
+    }
+  ],
+  "examples": [
+    { "level": "basic", "text": "Uranium-238 (Z = 92) alpha-decays: A 238 → 234, Z 92 → 90, giving Thorium-234.", "latex": "^{238}_{92}U \\to ^{234}_{90}Th + ^{4}_{2}He" },
+    { "level": "challenging", "text": "Carbon-14 (Z = 6) beta-decays: A stays 14, Z rises to 7, giving Nitrogen-14.", "latex": "^{14}_{6}C \\to ^{14}_{7}N + e^-" }
+  ],
+  "practice": [
+    { "id": "q1", "difficulty": 1, "prompt": "Uranium-238 alpha-decays. Find the mass number A of the new nucleus.", "answer": "234", "prerequisites": ["alpha-decay"] },
+    { "id": "q2", "difficulty": 1, "prompt": "Uranium-238 (Z = 92) alpha-decays. Find the atomic number Z of the new nucleus.", "answer": "90", "prerequisites": ["alpha-decay"] },
+    { "id": "q3", "difficulty": 2, "prompt": "Carbon-14 (Z = 6) beta-decays. Find the atomic number Z of the new nucleus.", "answer": "7", "prerequisites": ["beta-decay"] },
+    { "id": "q4", "difficulty": 2, "prompt": "An alpha particle is emitted. What is its mass number?", "answer": "4", "prerequisites": ["alpha-decay"] },
+    { "id": "q5", "difficulty": 3, "prompt": "Polonium-218 (Z = 84) alpha-decays twice in a row. Find the final atomic number Z.", "answer": "80", "prerequisites": ["alpha-decay"] }
+  ]
+}

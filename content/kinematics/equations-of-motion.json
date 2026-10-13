@@ -1,0 +1,58 @@
+{
+  "subtopic": "Equations of Motion",
+  "topic": "Kinematics",
+  "subject": "Physics",
+  "concept": "For constant acceleration, the SUVAT equations link displacement (s), initial and final velocity (u, v), acceleration (a) and time (t). Pick the equation that skips the quantity you don't know.",
+  "formulas": [
+    {
+      "id": "suvat-v",
+      "latex": "v = u + at",
+      "symbols": [
+        { "name": "v", "meaning": "final velocity", "unit": "m/s" },
+        { "name": "u", "meaning": "initial velocity", "unit": "m/s" },
+        { "name": "a", "meaning": "constant acceleration", "unit": "m/s²" },
+        { "name": "t", "meaning": "time", "unit": "s" }
+      ],
+      "when_to_use": "Find velocity after a time, or time for a velocity change. Skips displacement.",
+      "derivation": "Acceleration definition rearranged: velocity grows linearly with time.",
+      "related": ["suvat-s", "suvat-v2"]
+    },
+    {
+      "id": "suvat-s",
+      "latex": "s = ut + \\frac{1}{2}at^2",
+      "symbols": [
+        { "name": "s", "meaning": "displacement", "unit": "m" },
+        { "name": "u", "meaning": "initial velocity", "unit": "m/s" },
+        { "name": "a", "meaning": "constant acceleration", "unit": "m/s²" },
+        { "name": "t", "meaning": "time", "unit": "s" }
+      ],
+      "when_to_use": "Find displacement over a time. Skips final velocity.",
+      "derivation": "Area under the velocity–time graph: rectangle plus triangle.",
+      "related": ["suvat-v", "suvat-v2"]
+    },
+    {
+      "id": "suvat-v2",
+      "latex": "v^2 = u^2 + 2as",
+      "symbols": [
+        { "name": "v", "meaning": "final velocity", "unit": "m/s" },
+        { "name": "u", "meaning": "initial velocity", "unit": "m/s" },
+        { "name": "a", "meaning": "constant acceleration", "unit": "m/s²" },
+        { "name": "s", "meaning": "displacement", "unit": "m" }
+      ],
+      "when_to_use": "Link velocities to displacement when time is unknown. Skips time.",
+      "derivation": "Eliminate t between the first two equations.",
+      "related": ["suvat-v", "suvat-s"]
+    }
+  ],
+  "examples": [
+    { "level": "basic", "text": "u = 0, a = 2 m/s², t = 6 s: v = 0 + 2×6 = 12 m/s.", "latex": "v = 0 + 2(6) = 12\\ \\text{m/s}" },
+    { "level": "challenging", "text": "u = 0, v = 30 m/s, a = 5 m/s²: s = (900 − 0)/(2×5) = 90 m, no time needed.", "latex": "s = (30^2 - 0^2)/(2 \\times 5) = 90\\ \\text{m}" }
+  ],
+  "practice": [
+    { "id": "q1", "difficulty": 1, "prompt": "u = 0 m/s, a = 2 m/s², t = 6 s. Find the final velocity v.", "answer": "12 m/s", "prerequisites": ["suvat-v"] },
+    { "id": "q2", "difficulty": 2, "prompt": "u = 10 m/s, a = 3 m/s², t = 4 s. Find the displacement s.", "answer": "64 m", "prerequisites": ["suvat-s"] },
+    { "id": "q3", "difficulty": 2, "prompt": "u = 0 m/s, v = 30 m/s, a = 5 m/s². Find the displacement s.", "answer": "90 m", "prerequisites": ["suvat-v2"] },
+    { "id": "q4", "difficulty": 3, "prompt": "u = 4 m/s, a = 2 m/s², t = 10 s. Find the displacement s.", "answer": "140 m", "prerequisites": ["suvat-s"] },
+    { "id": "q5", "difficulty": 3, "prompt": "u = 5 m/s, v = 25 m/s, a = 4 m/s². Find the time t.", "answer": "5 s", "prerequisites": ["suvat-v"] }
+  ]
+}

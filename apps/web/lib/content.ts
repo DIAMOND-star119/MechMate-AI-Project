@@ -1,4 +1,9 @@
+import displacement from "../../../content/kinematics/displacement.json";
 import velocity from "../../../content/kinematics/velocity.json";
+import acceleration from "../../../content/kinematics/acceleration.json";
+import equationsOfMotion from "../../../content/kinematics/equations-of-motion.json";
+import projectileMotion from "../../../content/kinematics/projectile-motion.json";
+import nuclearDecayModes from "../../../content/radioactivity/nuclear-decay-modes.json";
 
 export interface SymbolDef {
   name: string;
@@ -31,7 +36,16 @@ export interface Subtopic {
   practice: { id: string; difficulty: number; prompt: string; answer: string; prerequisites: string[] }[];
 }
 
-const SUBTOPICS: Subtopic[] = [velocity as Subtopic];
+// Natural learning order: position → velocity → acceleration → the
+// equations that bind them → two-dimensional motion.
+const SUBTOPICS: Subtopic[] = [
+  displacement as Subtopic,
+  velocity as Subtopic,
+  acceleration as Subtopic,
+  equationsOfMotion as Subtopic,
+  projectileMotion as Subtopic,
+  nuclearDecayModes as Subtopic
+];
 
 export function listSubtopics(): Pick<Subtopic, "subtopic" | "topic" | "subject">[] {
   return SUBTOPICS.map((s) => ({ subtopic: s.subtopic, topic: s.topic, subject: s.subject }));
