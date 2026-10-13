@@ -25,7 +25,9 @@ const extraOrigins = (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "")
 // unique deployment URL, the stable branch URL, and the production domain.
 // Trusting all of them means login works no matter which address is opened,
 // even after redeploys change the deployment URL. All three belong to this
-// project, so nothing foreign is trusted.
+// project, so nothing foreign is trusted. (These are only present if the
+// "System Environment Variables" access is enabled in Vercel; the dynamic
+// same-origin rule below covers every case regardless.)
 const vercelOrigins = [
   process.env.VERCEL_URL,
   process.env.VERCEL_BRANCH_URL,
@@ -33,6 +35,10 @@ const vercelOrigins = [
 ]
   .filter((h): h is string => !!h)
   .map((h) => `https://${h}`);
+
+// Static part of the trust list: configured site URL, Vercel addresses,
+// and any extra origins from the environment.
+const staticOrigins = () => [siteURL, ...vercelOrigins, ...extraOrigins];
 
 // Identity (brief §§22–24): username+password signup, email never required.
 // Email sign-in and anonymous guest keep working; guests can upgrade to a
@@ -51,6 +57,28 @@ export const auth = betterAuth({
   baseURL: siteURL,
   // Without this, every browser auth POST from the production origin is
   // rejected with 403 INVALID_ORIGIN whenever BETTER_AUTH_URL is unset or
-  // stale. The primary origin is always trusted; extras come from the env.
-  trustedOrigins: [siteURL, ...vercelOrigins, ...extraOrigins],
+  // stale. The configured/Vercel origins are always trusted, plus a dynamic
+  // same-origin rule: a request whose Origin header names the very host it
+  // was sent to is by definition same-origin (the app posts to its own
+  // address), so it is accepted. A foreign page sends an Origin naming a
+  // DIFFERENT host than the API URL, so cross-site forgery is still
+  // rejected. This keeps login working on every current and future
+  // deployment address with zero dashboard upkeep.
+  trustedOrigins: async (request) => {
+    const origins = staticOrigins();
+    try {
+      if (request) {
+        const apiHost = new URL(request.url).host;
+        const header =
+          request.headers.get("origin") ?? request.headers.get("referer") ?? "";
+        const sender = new URL(header).origin;
+        if (new URL(sender).host === apiHost && !origins.includes(sender)) {
+          origins.push(sender);
+        }
+      }
+    } catch {
+      // Unparseable URL/header: fall back to the static list only.
+    }
+    return origins;
+  },
 });
