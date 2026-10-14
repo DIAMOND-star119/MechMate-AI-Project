@@ -25,6 +25,14 @@ export function PracticeRunner({ items, subtopic }: { items: PracticeItem[]; sub
     const r: AttemptResult = { id: current.id, correct, prerequisites: current.prerequisites, answer: current.answer, given: given.trim() };
     const next = [...results, r];
     setResults(next);
+    // Persist to the account (server derives progress/mastery from this, so
+    // it syncs across devices). Guests aren't signed in: the 401 is ignored
+    // and practice simply stays local for them.
+    fetch("/api/attempts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ questionId: current.id, correct, userAnswer: given.trim(), subtopic, prompt: current.prompt })
+    }).catch(() => {});
     const ns = correct ? streak + 1 : 0;
     setStreak(ns);
     setLevel(nextLevel(level, ns, correct, maxLevel));

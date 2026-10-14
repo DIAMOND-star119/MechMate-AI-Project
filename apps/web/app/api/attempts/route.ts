@@ -7,20 +7,30 @@ export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
   const uid = session?.user?.id;
   if (!uid) return NextResponse.json({ error: "sign in first" }, { status: 401 });
-  const { questionId, correct, userAnswer } = (await req.json()) as {
+  const { questionId, correct, userAnswer, subtopic, prompt } = (await req.json()) as {
     questionId?: string;
     correct?: boolean;
     userAnswer?: string;
+    subtopic?: string;
+    prompt?: string;
   };
   if (!questionId || typeof correct !== "boolean") {
     return NextResponse.json({ error: "questionId + correct required" }, { status: 400 });
   }
-  const question = await db.practiceQuestion.findFirst({ where: { id: questionId } });
-  const key = question?.id ?? questionId;
-  // Seed ids are slugs (q1), DB ids are cuids — match by prompt fallback below.
-  const dbQuestion =
-    question ?? (await db.practiceQuestion.findFirst({ where: { subtopic: { name: "Velocity" } }, orderBy: { difficulty: "asc" } }));
-  if (!dbQuestion) return NextResponse.json({ error: "no questions seeded — run prisma db seed" }, { status: 409 });
+  // Resolve the real question row. Curated lesson items use slug ids ("q1")
+  // shared across subtopics, so id alone can mismatch: disambiguate with the
+  // subtopic name + prompt text. NEVER silently attribute an attempt to the
+  // wrong subtopic (that corrupts progress + mastery for two lessons).
+  let dbQuestion = await db.practiceQuestion.findFirst({ where: { id: questionId } });
+  if (!dbQuestion && subtopic && prompt) {
+    const sub = await db.subtopic.findFirst({ where: { name: { equals: subtopic, mode: "insensitive" } } });
+    if (sub) {
+      dbQuestion = await db.practiceQuestion.findFirst({
+        where: { subtopicId: sub.id, promptLatex: prompt }
+      });
+    }
+  }
+  if (!dbQuestion) return NextResponse.json({ error: "unknown question — no attempt recorded" }, { status: 409 });
   const attempt = await db.attempt.create({
     data: { userId: uid, questionId: dbQuestion.id, userAnswer: userAnswer ?? "", correct }
   });
@@ -30,5 +40,5 @@ export async function POST(req: Request) {
     update: { status: correct ? "mastered" : "struggling" },
     create: { userId: uid, subtopicId: dbQuestion.subtopicId, status: correct ? "mastered" : "struggling" }
   });
-  return NextResponse.json({ attempt: { id: attempt.id, key } });
+  return NextResponse.json({ attempt: { id: attempt.id, key: dbQuestion.id } });
 }

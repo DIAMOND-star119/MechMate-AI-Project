@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
     "db:start": "pg_ctl -D \"%USERPROFILE%\\pgsql-data\" -l \"%USERPROFILE%\\pgsql-data\\logfile.log\" -o \"-p 5433\" start",
     "db:stop": "pg_ctl -D \"%USERPROFILE%\\pgsql-data\" stop",
     "db:migrate": "prisma migrate dev",
@@ -29,6 +30,7 @@
     "prisma": "^6.19.3",
     "tailwindcss": "4.1.13",
     "tsx": "^4.23.15",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "^5.0.4"
   }
 }

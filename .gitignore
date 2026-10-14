@@ -8,6 +8,8 @@ dist/
 .netlify-token
 .netlify/
 *.log
+*.apk
+*.aab
 *.tsbuildinfo
 .DS_Store
 Thumbs.db

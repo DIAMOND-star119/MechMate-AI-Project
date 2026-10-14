@@ -36,6 +36,14 @@ function newKey(): string {
     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+// A message asks for a full lesson (not just an answer) when it looks like
+// a teaching request. Ordinary questions never trigger lesson creation.
+function isLessonRequest(text: string): boolean {
+  return /\b(teach me|create (me )?notes?|explain .* (from (the beginning|scratch)|in full)|give me .* formulas?|study guide|full lesson|entire topic)\b/i.test(
+    text
+  );
+}
+
 export function CompanionPreview({ topics, initial }: { topics: { subtopic: string; topic: string }[]; initial?: string }) {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [chats, setChats] = useState<Convo[]>([]);
@@ -44,6 +52,14 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [custom, setCustom] = useState("");
+  const [offer, setOffer] = useState<null | {
+    q: string;
+    state: "offer" | "building" | "done" | "error";
+    href?: string;
+    topic?: string;
+    text?: string;
+  }>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -89,8 +105,12 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
 
   async function send(text?: string) {
     const q = (text ?? input).trim();
-    const topic = activeTopicRef.current;
+    // Preset chip topic wins; otherwise the student's own typed topic works —
+    // questions are no longer restricted to the preset list.
+    let topic = activeTopicRef.current ?? (custom.trim() || null);
     if (!q || busy || !topic) return;
+    topic = topic.slice(0, 120);
+    if (!activeTopicRef.current) setActiveTopic(topic);
     const ukey = newKey();
     const akey = newKey();
     setMsgs((m) => [...m, { key: ukey, role: "user", text: q, save: "pending" as const }]);
@@ -128,6 +148,9 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
       ]).catch(() => {
         setMsgs((m) => m.map((x) => (x.key === akey ? { ...x, save: "failed" as const } : x)));
       });
+      // Lesson intent, not just a question: offer to build the full
+      // structured lesson (formulas, practice, progress) exactly once.
+      if (isLessonRequest(q)) setOffer({ q, state: "offer" });
       fetch(`/api/chats/${id}/title`, { method: "POST" })
         .then((r) => r.json())
         .then((d) => d.title && loadList())
@@ -181,6 +204,28 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
     await fetch(`/api/chats/${id}`, { method: "DELETE" });
     if (activeId === id) newChat();
     loadList();
+  }
+
+  // Turn a "teach me X" message into a full structured lesson. Ordinary
+  // questions never reach here — only explicit user taps.
+  async function buildLesson() {
+    if (!offer || offer.state === "building" || offer.state === "done") return;
+    setOffer({ ...offer, state: "building" });
+    try {
+      const r = await fetch("/api/topics/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: offer.q })
+      });
+      const d = (await r.json()) as { status?: string; href?: string; topic?: string; text?: string };
+      if (d.href) {
+        setOffer({ ...offer, state: "done", href: d.href, topic: d.topic });
+      } else {
+        setOffer({ ...offer, state: "error", text: d.text ?? "Couldn't build that lesson yet." });
+      }
+    } catch {
+      setOffer({ ...offer, state: "error", text: "Couldn't reach the server. Try again." });
+    }
   }
 
   if (authed === false) {
@@ -269,10 +314,18 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
             {topics.map((t) => (
               <button key={t.subtopic} disabled={busy}
                 className={`rounded-full px-4 py-2 text-sm font-bold ${activeTopic === t.subtopic ? "bg-indigo-800 text-white" : "bg-indigo-600 text-white"} disabled:opacity-50`}
-                onClick={() => setActiveTopic(t.subtopic)}>
+                onClick={() => { setActiveTopic(t.subtopic); setCustom(""); }}>
                 {t.subtopic}
               </button>
             ))}
+          </div>
+        )}
+        {!activeTopic && (
+          <div className="mb-3 flex gap-2">
+            <input className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" value={custom}
+              onChange={(e) => setCustom(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") (document.getElementById("companion-send") as HTMLButtonElement | null)?.click(); }}
+              aria-label="Or type any study topic" placeholder="Or type any topic — e.g. thermodynamics, Shakespeare…" />
           </div>
         )}
         <div className="max-w-2xl space-y-3" aria-live="polite">
@@ -301,10 +354,28 @@ export function CompanionPreview({ topics, initial }: { topics: { subtopic: stri
             <input className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow" value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") send(); }}
-              aria-label="Message the companion" placeholder={activeTopic ? `Ask about ${activeTopic}…` : "Pick a topic first…"} disabled={!activeTopic} />
-            <button className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
-              onClick={() => send()} disabled={busy || !input.trim() || !activeTopic}>Send</button>
+              aria-label="Message the companion" placeholder={activeTopic ?? custom.trim() ? `Ask about ${activeTopic ?? custom.trim()}…` : "Pick a topic above, or type one…"} disabled={busy || !(activeTopic ?? custom.trim())} />
+            <button id="companion-send" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              onClick={() => send()} disabled={busy || !input.trim() || !(activeTopic ?? custom.trim())}>Send</button>
           </div>
+          {offer && (
+            <div className="mt-2 rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm" aria-live="polite">
+              {offer.state === "offer" && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span>Want this as a full lesson (notes, formulas, practice, progress)?</span>
+                  <button className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-bold text-white" onClick={buildLesson}>Build structured lesson</button>
+                  <button className="text-xs text-slate-500 underline" onClick={() => setOffer(null)}>No thanks</button>
+                </div>
+              )}
+              {offer.state === "building" && <p>Building your lesson…</p>}
+              {offer.state === "done" && offer.href && (
+                <p><b>{offer.topic ?? "Lesson"} is ready.</b> <Link className="text-indigo-700 underline" href={offer.href}>Open structured lesson →</Link></p>
+              )}
+              {offer.state === "error" && (
+                <p>{offer.text} <button className="underline" onClick={buildLesson}>Retry</button></p>
+              )}
+            </div>
+          )}
           <div className="mt-2 flex flex-wrap gap-2">
             <button className="rounded-full border bg-white px-3 py-1 text-sm" onClick={() => send("Explain that differently — use an analogy or a simpler example.")} disabled={busy || !activeTopic}>I don&apos;t understand</button>
             {activeTopic && <Link className="rounded-full border bg-white px-3 py-1 text-sm text-indigo-700" href={`/learn/${encodeURIComponent(activeTopic.toLowerCase())}`}>Study notes · Practice →</Link>}

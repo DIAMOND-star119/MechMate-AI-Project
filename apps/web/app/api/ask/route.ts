@@ -4,6 +4,7 @@ import { ai } from "../../../lib/ai";
 import { auth } from "../../../lib/auth";
 import { fallbackAnswer } from "../../../lib/fallback";
 import { classify, refusalText, recordAlert } from "../../../lib/moderate";
+import { rateLimit, clientIp } from "../../../lib/rate-limit";
 
 export async function POST(req: Request) {
   const { question, subtopicId, formulaId, history } = (await req.json()) as {
@@ -14,6 +15,9 @@ export async function POST(req: Request) {
   };
   if (!question?.trim() || !subtopicId) {
     return NextResponse.json({ error: "question and subtopicId required" }, { status: 400 });
+  }
+  if (!rateLimit(`ask:${clientIp(req)}`, 30, 60_000)) {
+    return NextResponse.json({ text: "Too many questions at once — wait a minute and try again.", source: "rate-limit" }, { status: 429 });
   }
   const mod = classify(question);
   if (mod.level !== "normal") {

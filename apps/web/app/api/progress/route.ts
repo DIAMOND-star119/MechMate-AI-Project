@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   if (!subtopicId || !["encountered", "mastered", "struggling", "strong"].includes(status ?? "")) {
     return NextResponse.json({ error: "subtopicId + valid status required" }, { status: 400 });
   }
-  const subtopic = await db.subtopic.findFirst({ where: { name: subtopicId } });
+  const subtopic = await db.subtopic.findFirst({ where: { name: { equals: subtopicId, mode: "insensitive" } } });
   if (!subtopic) return NextResponse.json({ error: "unknown subtopic — seed it first" }, { status: 404 });
   const row = await db.progress.upsert({
     where: { userId_subtopicId: { userId: uid, subtopicId: subtopic.id } },

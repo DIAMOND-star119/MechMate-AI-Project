@@ -5,6 +5,7 @@ import { auth } from "../../../../lib/auth";
 import { db } from "../../../../lib/db";
 import { research } from "../../../../lib/research";
 import { classify, refusalText, recordAlert } from "../../../../lib/moderate";
+import { rateLimit, clientIp } from "../../../../lib/rate-limit";
 
 // "Teach me X" (brief §§4, 17–21): draft scope with the model, ground with web
 // sources, validate structure, persist as origin:'ai' content. Thin or missing
@@ -13,6 +14,9 @@ export async function POST(req: Request) {
   const { text } = (await req.json()) as { text?: string };
   const clean = (text ?? "").trim().slice(0, 200);
   if (!clean) return NextResponse.json({ error: "text required" }, { status: 400 });
+  if (!rateLimit(`topics:${clientIp(req)}`, 10, 60_000)) {
+    return NextResponse.json({ status: "unknown", text: "Too many requests — wait a minute and try again." }, { status: 429 });
+  }
 
   const mod = classify(clean);
   if (mod.level !== "normal") {

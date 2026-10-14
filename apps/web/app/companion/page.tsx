@@ -6,7 +6,10 @@ import { listSubtopics } from "../../lib/content";
 export default async function CompanionPage({ searchParams }: { searchParams: Promise<{ topic?: string }> }) {
   const { topic } = await searchParams;
   const topics = listSubtopics();
-  const initial = topics.some((t) => t.subtopic.toLowerCase() === (topic ?? "").toLowerCase()) ? topic! : undefined;
+  // Any topic label works here (preset chips are just shortcuts); the
+  // companion answers general questions on unlisted subjects too.
+  const clean = (topic ?? "").trim().slice(0, 120);
+  const initial = clean ? clean : undefined;
   return (
     <main className="mx-auto max-w-3xl px-5 pb-20 pt-7">
       <header className="mb-5 flex items-center gap-3">
