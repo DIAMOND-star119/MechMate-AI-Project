@@ -25,9 +25,15 @@ export async function POST(req: Request) {
   if (!dbQuestion && subtopic && prompt) {
     const sub = await db.subtopic.findFirst({ where: { name: { equals: subtopic, mode: "insensitive" } } });
     if (sub) {
-      dbQuestion = await db.practiceQuestion.findFirst({
-        where: { subtopicId: sub.id, promptLatex: prompt }
-      });
+      // Prompts travel through JSON/HTML layers that can alter whitespace or
+      // Unicode forms (arrows, superscripts): compare normalized forms.
+      const norm = (s: string) => s.normalize("NFC").replace(/\s+/g, " ").trim();
+      const want = norm(prompt);
+      const candidates = await db.practiceQuestion.findMany({ where: { subtopicId: sub.id } });
+      dbQuestion =
+        candidates.find((q) => q.promptLatex === prompt) ??
+        candidates.find((q) => norm(q.promptLatex) === want) ??
+        null;
     }
   }
   if (!dbQuestion) return NextResponse.json({ error: "unknown question — no attempt recorded" }, { status: 409 });

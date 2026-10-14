@@ -42,7 +42,23 @@ export async function GET() {
     return NextResponse.json({ signedIn: false, catalogue });
   }
 
+  // The per-user rollup must never hard-fail the dashboard: on any query
+  // error return the catalogue with degraded:true (and log the cause
+  // server-side for diagnosis) instead of a 500 with nothing.
   const uid = session.user.id;
+  try {
+    return NextResponse.json(await buildUserDashboard(uid, topics, catalogue));
+  } catch (e) {
+    console.error(`[dashboard] per-user rollup failed: ${(e as Error).message}`);
+    return NextResponse.json({ signedIn: true, catalogue, degraded: true });
+  }
+}
+
+async function buildUserDashboard(
+  uid: string,
+  topics: TopicRow[],
+  catalogue: { topic: string; subject: string; subtopics: string[] }[]
+) {
   const [progress, recent, states]: [ProgressRow[], AttemptRow[], Awaited<ReturnType<typeof getTopicState>>[]] = await Promise.all([
     db.progress.findMany({ where: { userId: uid }, include: { subtopic: { select: { id: true, name: true, topicId: true } } } }),
     db.attempt.findMany({
@@ -81,7 +97,7 @@ export async function GET() {
     ? Math.round(perTopic.reduce((a, t) => a + t.percent, 0) / perTopic.length)
     : 0;
 
-  return NextResponse.json({
+  return {
     signedIn: true,
     catalogue,
     overall,
@@ -94,5 +110,5 @@ export async function GET() {
       at: a.createdAt
     })),
     remaining: perTopic.reduce((a, t) => a + t.sections.filter((s) => !s.covered).length, 0)
-  });
+  };
 }
