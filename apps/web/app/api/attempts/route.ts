@@ -22,21 +22,32 @@ export async function POST(req: Request) {
   // subtopic name + prompt text. NEVER silently attribute an attempt to the
   // wrong subtopic (that corrupts progress + mastery for two lessons).
   let dbQuestion = await db.practiceQuestion.findFirst({ where: { id: questionId } });
+  let reason: "noid" | "nosub" | "noquestion" = "noid";
+  let candidates = 0;
   if (!dbQuestion && subtopic && prompt) {
     const sub = await db.subtopic.findFirst({ where: { name: { equals: subtopic, mode: "insensitive" } } });
-    if (sub) {
+    if (!sub) {
+      reason = "nosub";
+    } else {
       // Prompts travel through JSON/HTML layers that can alter whitespace or
       // Unicode forms (arrows, superscripts): compare normalized forms.
       const norm = (s: string) => s.normalize("NFC").replace(/\s+/g, " ").trim();
       const want = norm(prompt);
-      const candidates = await db.practiceQuestion.findMany({ where: { subtopicId: sub.id } });
+      const rows = await db.practiceQuestion.findMany({ where: { subtopicId: sub.id } });
+      candidates = rows.length;
       dbQuestion =
-        candidates.find((q) => q.promptLatex === prompt) ??
-        candidates.find((q) => norm(q.promptLatex) === want) ??
+        rows.find((q) => q.promptLatex === prompt) ??
+        rows.find((q) => norm(q.promptLatex) === want) ??
         null;
+      if (!dbQuestion) reason = "noquestion";
     }
   }
-  if (!dbQuestion) return NextResponse.json({ error: "unknown question — no attempt recorded" }, { status: 409 });
+  if (!dbQuestion) {
+    return NextResponse.json(
+      { error: "unknown question — no attempt recorded", reason, candidates },
+      { status: 409 }
+    );
+  }
   const attempt = await db.attempt.create({
     data: { userId: uid, questionId: dbQuestion.id, userAnswer: userAnswer ?? "", correct }
   });
